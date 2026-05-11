@@ -86,7 +86,7 @@ class ChatService {
                 session.send(Frame.Text(messageJson))
             } catch (e: Exception) {
                 println("Error enviando a $username: ${e.message}")
-                onLeave(username, room)
+                onLeave(username, room, session)
             }
         }
     }
