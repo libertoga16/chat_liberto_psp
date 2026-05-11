@@ -35,12 +35,18 @@ object DatabaseFactory {
         val rawUrl = System.getenv("DATABASE_URL")
             ?: throw IllegalStateException("DATABASE_URL no configurada")
 
-        val jdbcUrl = if (rawUrl.startsWith("jdbc:")) rawUrl
-                      else "jdbc:" + rawUrl.replace("postgres://", "postgresql://")
+        val uri = java.net.URI(rawUrl)
+        val userInfo = uri.userInfo?.split(":") ?: emptyList()
+        val user = userInfo.getOrNull(0) ?: ""
+        val password = userInfo.getOrNull(1) ?: ""
+        val port = if (uri.port > 0) ":${uri.port}" else ""
+        val jdbcUrl = "jdbc:postgresql://${uri.host}$port${uri.path}"
 
         val database = Database.connect(
             url = jdbcUrl,
-            driver = "org.postgresql.Driver"
+            driver = "org.postgresql.Driver",
+            user = user,
+            password = password
         )
 
         transaction(database) {
