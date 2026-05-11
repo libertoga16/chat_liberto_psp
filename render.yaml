@@ -6,3 +6,11 @@ services:
     envVars:
       - key: PORT
         value: 8080
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kotlinchat-db
+          property: connectionString
+
+databases:
+  - name: kotlinchat-db
+    plan: free

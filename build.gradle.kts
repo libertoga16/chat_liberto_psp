@@ -35,12 +35,12 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktor_version")
     implementation("org.mindrot:jbcrypt:0.4")
 
-    // Base de datos: Exposed + SQLite
+    // Base de datos: Exposed + PostgreSQL
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
-    implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+    implementation("org.postgresql:postgresql:42.7.3")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")

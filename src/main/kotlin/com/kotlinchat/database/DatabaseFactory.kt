@@ -11,6 +11,8 @@ object Users : Table("users") {
     val id = integer("id").autoIncrement()
     val username = varchar("username", 50).uniqueIndex()
     val passwordHash = varchar("password_hash", 255)
+    val email = varchar("email", 255).nullable()
+    val address = varchar("address", 500).nullable()
     val createdAt = datetime("created_at").default(LocalDateTime.now())
 
     override val primaryKey = PrimaryKey(id)
@@ -30,13 +32,19 @@ object Messages : Table("messages") {
 object DatabaseFactory {
 
     fun init() {
+        val rawUrl = System.getenv("DATABASE_URL")
+            ?: throw IllegalStateException("DATABASE_URL no configurada")
+
+        val jdbcUrl = if (rawUrl.startsWith("jdbc:")) rawUrl
+                      else "jdbc:" + rawUrl.replace("postgres://", "postgresql://")
+
         val database = Database.connect(
-            url = "jdbc:sqlite:./kotlinchat.db",
-            driver = "org.sqlite.JDBC"
+            url = jdbcUrl,
+            driver = "org.postgresql.Driver"
         )
 
         transaction(database) {
-            SchemaUtils.create(Users, Messages)
+            SchemaUtils.createMissingTablesAndColumns(Users, Messages)
         }
 
         println("Base de datos inicializada")

@@ -6,7 +6,22 @@ import java.time.LocalDateTime
 @Serializable
 data class RegisterRequest(
     val username: String,
-    val password: String
+    val password: String,
+    val email: String = "",
+    val address: String = ""
+)
+
+@Serializable
+data class ProfileResponse(
+    val username: String,
+    val email: String,
+    val address: String
+)
+
+@Serializable
+data class UpdateProfileRequest(
+    val email: String = "",
+    val address: String = ""
 )
 
 @Serializable
@@ -40,6 +55,8 @@ data class ChatUser(
     val id: Int,
     val username: String,
     val passwordHash: String,
+    val email: String = "",
+    val address: String = "",
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
 
