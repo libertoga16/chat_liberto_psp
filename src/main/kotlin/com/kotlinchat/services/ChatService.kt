@@ -50,23 +50,26 @@ class ChatService {
         println("$username conectado a sala '$room' | Usuarios: ${getUsersInRoom(room).size}")
     }
 
-    suspend fun onLeave(username: String, room: String) {
-        connectionsMutex.withLock {
-            connections[room]?.remove(username)
-            if (connections[room]?.isEmpty() == true) {
-                connections.remove(room)
-            }
+    suspend fun onLeave(username: String, room: String, session: WebSocketSession) {
+        val removed = connectionsMutex.withLock {
+            val current = connections[room]?.get(username)
+            if (current === session) {
+                connections[room]?.remove(username)
+                if (connections[room]?.isEmpty() == true) connections.remove(room)
+                true
+            } else false
         }
 
-        val leaveMessage = WsMessage(
-            type = "leave",
-            sender = "sistema",
-            content = "$username ha salido de la sala",
-            room = room
-        )
-        broadcast(leaveMessage, room)
-
-        println("$username desconectado de sala '$room'")
+        if (removed) {
+            val leaveMessage = WsMessage(
+                type = "leave",
+                sender = "sistema",
+                content = "$username ha salido de la sala",
+                room = room
+            )
+            broadcast(leaveMessage, room)
+            println("$username desconectado de sala '$room'")
+        }
     }
 
     suspend fun broadcast(message: WsMessage, room: String) {

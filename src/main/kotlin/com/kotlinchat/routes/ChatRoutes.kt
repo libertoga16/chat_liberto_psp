@@ -40,7 +40,7 @@ fun Route.chatRoutes(chatService: ChatService, processService: ProcessService) {
         } catch (e: Exception) {
             println("Error en WebSocket de $username: ${e.message}")
         } finally {
-            chatService.onLeave(username, room)
+            chatService.onLeave(username, room, this)
         }
     }
 
