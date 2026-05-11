@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import com.kotlinchat.database.Users
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.SortOrder
@@ -92,7 +93,11 @@ class ChatService {
     }
 
     suspend fun handleMessage(username: String, room: String, content: String) {
-        saveMessage(username, room, content)
+        try {
+            saveMessage(username, room, content)
+        } catch (e: Exception) {
+            println("Error guardando mensaje: ${e.message}")
+        }
 
         val chatMessage = WsMessage(
             type = "chat",
@@ -146,8 +151,11 @@ class ChatService {
 
     private suspend fun saveMessage(username: String, room: String, content: String) {
         dbQuery {
+            val userId = Users.selectAll()
+                .where { Users.username eq username }
+                .singleOrNull()?.get(Users.id) ?: return@dbQuery
             Messages.insert {
-                it[senderId] = 0
+                it[senderId] = userId
                 it[senderName] = username
                 it[Messages.room] = room
                 it[Messages.content] = content
